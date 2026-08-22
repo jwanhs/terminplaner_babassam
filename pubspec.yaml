@@ -1,0 +1,84 @@
+name: babassam
+description: "Ba-Ba'Ssam appointment booking — customer app and staff panel."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+  # State management
+  get: ^4.6.6
+
+  # Theming
+  flex_color_scheme: ^8.4.0
+  #
+  # google_fonts is deliberately absent. It fetches font files from Google's
+  # servers on first use, which hands every visitor's IP address to Google —
+  # the fact pattern behind LG München I, 20.01.2022, 3 O 17493/20, and squarely
+  # on the web build a German salon's customers use. The two families are
+  # bundled under assets/fonts instead; see the `fonts:` section below.
+
+  # Backend
+  appwrite: ^24.0.0
+
+  # Payments
+  #
+  # flutter_stripe's web support is a separate federated package that isn't
+  # pulled in automatically — without it, Stripe.instance has no platform
+  # implementation on web and throws before the app can render.
+  flutter_stripe: ^11.1.0
+  flutter_stripe_web: ^6.5.1
+
+  # Calendar integration
+  add_2_calendar: ^3.0.1
+
+  # Local storage — holds the manage tokens that prove a booking belongs to
+  # this device, which is what replaces having an account.
+  shared_preferences: ^2.3.0
+
+  # Utilities
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Bundled, not fetched — see the note by the dependencies above. Both families
+  # are SIL Open Font License 1.1; the licence texts ship alongside them, which
+  # is what the OFL requires when the fonts are redistributed.
+  #
+  # Weights are the ones the app actually asks for (see lib/core/theme.dart and
+  # the w500/w600/w700 usages across the widgets). Flutter falls back to the
+  # nearest declared weight rather than synthesising, so a weight used but not
+  # declared here renders subtly wrong rather than failing.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: Playfair Display
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlayfairDisplay-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlayfairDisplay-Bold.ttf
+          weight: 700

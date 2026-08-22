@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Terminplaner — Einseiter</title>
+
+<!--
+  ===========================================================================
+  Der Einseiter, den man im Laden dalässt. A4, eine Seite, im Browser drucken.
+
+  VOR DEM DRUCKEN AUSFÜLLEN — im Markup als [ECKIGE KLAMMERN] markiert:
+    • Name, Telefon, E-Mail unten
+    • Preise, falls sie von den hier eingetragenen abweichen
+
+  ZWEI DINGE, DIE HIER BEWUSST FEHLEN:
+
+  Erinnerungen per SMS stehen unter "In Vorbereitung", nicht bei den
+  Funktionen. Der geplante Job, der reminder_sent_at ausliest, ist nicht
+  geschrieben (siehe README, "Still open"). Ein Salon, dem man Erinnerungen
+  verkauft und der dann keine bekommt, kündigt in Woche zwei und erzählt es
+  jedem Kollegen in der Straße.
+
+  Aussagen zum Hosting-Standort fehlen ebenfalls. Erst prüfen, in welcher
+  Region das Appwrite-Projekt tatsächlich läuft, dann behaupten — nicht
+  umgekehrt. Siehe legal/README.md.
+  ===========================================================================
+-->
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #6E1A1F;
+    --secondary: #C9A961;
+    --ink: #2A1810;
+    --paper: #FBF6EB;
+  }
+
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #6b6b6b;
+    font-size: 3.3mm;
+    line-height: 1.4;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 8mm auto;
+    padding: 12mm 16mm 10mm;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header { border-bottom: 0.8mm solid var(--secondary); padding-bottom: 3.5mm; }
+
+  .wordmark {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 9.5mm;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.3mm;
+  }
+
+  .strapline {
+    font-size: 4mm;
+    letter-spacing: 0.6mm;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-top: 1.5mm;
+  }
+
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 5.4mm;
+    color: var(--primary);
+    margin: 4.5mm 0 2mm;
+  }
+
+  .lede {
+    font-size: 4.2mm;
+    line-height: 1.35;
+    margin-top: 4mm;
+  }
+
+  .lede strong { color: var(--primary); }
+
+  /* The box the shop owner fills in themselves. Handing over a pen and
+     letting them do the multiplication beats any figure we could print. */
+  .rechnung {
+    border: 0.5mm solid var(--primary);
+    padding: 3.5mm 5mm;
+    margin-top: 4mm;
+    background: rgba(201, 169, 97, 0.10);
+  }
+
+  .rechnung h3 {
+    font-size: 4.2mm;
+    margin-bottom: 2mm;
+    color: var(--primary);
+  }
+
+  .zeile {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1.1mm 0;
+    gap: 4mm;
+  }
+
+  .zeile + .zeile { border-top: 0.2mm dotted rgba(42, 24, 16, 0.3); }
+
+  .blank {
+    flex: 0 0 34mm;
+    border-bottom: 0.4mm solid var(--ink);
+    height: 5mm;
+  }
+
+  .summe { font-weight: 700; }
+
+  ul, ol { list-style: none; }
+
+  li {
+    padding-left: 6mm;
+    position: relative;
+    margin-bottom: 1.3mm;
+  }
+
+  li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--secondary);
+    font-weight: 700;
+  }
+
+  .preise {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1mm;
+  }
+
+  .preise th, .preise td {
+    text-align: left;
+    padding: 1.7mm 3mm;
+    border-bottom: 0.2mm solid rgba(42, 24, 16, 0.18);
+  }
+
+  .preise th { color: var(--primary); font-size: 3.4mm; }
+  .preise td:last-child { text-align: right; white-space: nowrap; font-weight: 600; }
+  .preise .note { font-size: 3.1mm; opacity: 0.7; font-weight: 400; }
+
+  .spalten { display: flex; gap: 9mm; }
+  .spalten > * { flex: 1; }
+
+  .schritte { counter-reset: schritt; }
+
+  .schritte li { padding-left: 8mm; margin-bottom: 1.5mm; }
+
+  .schritte li::before {
+    counter-increment: schritt;
+    content: counter(schritt);
+    color: var(--secondary);
+    font-weight: 700;
+    font-size: 4.4mm;
+  }
+
+  footer {
+    margin-top: auto;
+    padding-top: 4mm;
+    border-top: 0.8mm solid var(--secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 6mm;
+  }
+
+  .kontakt { font-size: 4.2mm; font-weight: 600; line-height: 1.6; }
+  .kontakt .label { display: block; font-size: 3.2mm; font-weight: 400;
+                    text-transform: uppercase; letter-spacing: 0.5mm;
+                    opacity: 0.6; margin-bottom: 1mm; }
+
+  .kleingedruckt { font-size: 2.9mm; opacity: 0.62; text-align: right;
+                   max-width: 78mm; line-height: 1.4; }
+
+  @page { size: A4; margin: 0; }
+  @media print { body { background: none; } .page { margin: 0; } }
+</style>
+</head>
+<body>
+
+<section class="page">
+
+  <header>
+    <div class="wordmark">Terminplaner</div>
+    <div class="strapline">Online-Terminbuchung für Friseure &amp; Barbiere</div>
+  </header>
+
+  <p class="lede">
+    Ein QR-Code am Spiegel. Der Kunde scannt, sieht Ihre freien Zeiten und
+    bucht — <strong>auch nachts um halb zwölf, wenn Ihr Laden zu ist.</strong>
+    Keine App, kein Konto, kein WhatsApp hin und her.
+  </p>
+
+  <div class="rechnung">
+    <h3>Was kostet Sie ein Kunde, der nicht kommt?</h3>
+    <div class="zeile">
+      <span>Nicht erschienene Kunden letzte Woche</span><span class="blank"></span>
+    </div>
+    <div class="zeile">
+      <span>Ihr durchschnittlicher Terminpreis</span><span class="blank"></span>
+    </div>
+    <div class="zeile summe">
+      <span>Das sind im Monat rund</span><span class="blank"></span>
+    </div>
+  </div>
+
+  <div class="spalten">
+    <div>
+      <h2>Was Sie bekommen</h2>
+      <ul>
+        <li>Ihre eigene Buchungsseite — Ihr Name, Ihre Farben, Ihre Preise</li>
+        <li>Tagesplan fürs Team: Termine, Laufkundschaft, Pausen, Öffnungszeiten</li>
+        <li>Anzahlung per Karte oder Apple&nbsp;Pay — wer zahlt, kommt</li>
+        <li>Treuekarte, die sich selbst zählt</li>
+        <li>Umbuchen und Absagen erledigt der Kunde selbst, bis zu Ihrer Frist</li>
+        <li>Gedruckter Aushang und Tischaufsteller mit Ihrem QR-Code</li>
+      </ul>
+      <p style="font-size:3.1mm;opacity:0.65;margin-top:2mm;">
+        In Vorbereitung: Erinnerung per SMS, mehrere Stühle parallel.
+      </p>
+    </div>
+
+    <div>
+      <h2>Was es kostet</h2>
+      <table class="preise">
+        <tr>
+          <th>Einrichtung<br><span class="note">einmalig, wir legen alles an</span></th>
+          <td>249&nbsp;€</td>
+        </tr>
+        <tr>
+          <th>Basis<br><span class="note">Buchung, Tagesplan, Aushang</span></th>
+          <td>29&nbsp;€ / Monat</td>
+        </tr>
+        <tr>
+          <th>Pro<br><span class="note">zusätzlich Anzahlung und Treuekarte</span></th>
+          <td>49&nbsp;€ / Monat</td>
+        </tr>
+        <tr>
+          <th>Provision je Kunde</th>
+          <td>0&nbsp;€</td>
+        </tr>
+      </table>
+      <p style="font-size:3.1mm;opacity:0.65;margin-top:2mm;">
+        Monatlich kündbar. Alle Preise zzgl. USt.
+      </p>
+    </div>
+  </div>
+
+  <h2>Der Unterschied zu den Portalen</h2>
+  <p>
+    Treatwell, Fresha und Booksy stellen Ihren Salon in einen Marktplatz neben
+    den Kollegen zwei Straßen weiter und verdienen an jedem Kunden mit — auch
+    an denen, die seit Jahren zu Ihnen kommen. Hier gibt es keinen Marktplatz
+    und keine Provision. Ihre Kundenliste gehört Ihnen, und wenn Sie aufhören,
+    bekommen Sie sie als Datei mit.
+  </p>
+
+  <h2>So geht es weiter</h2>
+  <ol class="schritte">
+    <li>Wir richten Ihnen eine Testseite mit Ihrem Namen und Ihren Farben ein — kostenlos, dauert einen Tag.</li>
+    <li>Sie probieren sie eine Woche im Laden aus, mit echten Kunden.</li>
+    <li>Wenn sie Ihnen nichts bringt, hören wir auf. Wenn doch, gehen wir live.</li>
+  </ol>
+
+  <footer>
+    <div class="kontakt">
+      <span class="label">Ihr Ansprechpartner</span>
+      [NAME]<br>
+      [TELEFON] · [E-MAIL]
+    </div>
+    <div class="kleingedruckt">
+      Auftragsverarbeitungsvertrag nach Art.&nbsp;28 DSGVO ist Bestandteil des
+      Vertrages. Kundendaten werden ausschließlich für Ihre Terminverwaltung
+      verarbeitet, nicht ausgewertet und nicht weitergegeben.
+    </div>
+  </footer>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "create-payment-intent",
+  "version": "1.0.0",
+  "description": "Mints a Stripe PaymentIntent for the BaBa'Ssam booking deposit.",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "echo 'Run via Appwrite Function execution'"
+  },
+  "dependencies": {
+    "stripe": "^16.0.0",
+    "undici": "^6.0.0"
+  }
+}

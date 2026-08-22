@@ -1,0 +1,13 @@
+{
+  "name": "terminplaner-tools",
+  "version": "1.0.0",
+  "description": "Sales-kit tooling — QR encoder and printable poster generator. No dependencies on purpose: this runs on a laptop about to walk into a shop.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test 'test/*.test.js'"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

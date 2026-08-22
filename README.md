@@ -1,0 +1,8 @@
+## Walkthrough
+
+https://github.com/user-attachments/assets/8d040239-55b4-430a-905d-76dd17ff6a4d
+
+Pick kind of service, choose who serves you, tap a day and grab a free slot.
+When you leave just a name and number, done, no account, no WhatsApp back-and-forth,
+your clients have an appointment.
+Idea: Set it up with a QR-Code and print on shop/company wall outdoors c:)

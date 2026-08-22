@@ -1,0 +1,17 @@
+{
+  "name": "booking-api",
+  "version": "1.0.0",
+  "description": "Customer-facing booking API for BaBa'Ssam — the only path from an anonymous client to the appointments table.",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/",
+    "start": "echo 'Run via Appwrite Function execution'"
+  },
+  "dependencies": {
+    "undici": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

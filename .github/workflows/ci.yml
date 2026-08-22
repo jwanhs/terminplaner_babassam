@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  # The booking logic that decides availability, ownership and money lives in
+  # the Appwrite Function, so it is the half worth testing hardest — and it
+  # runs on plain Node with no install step.
+  backend:
+    name: Booking API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test booking-api
+        working-directory: infra/functions/booking-api
+        run: node --test 'test/*.test.js'
+      - name: Syntax-check the other functions
+        run: |
+          node --check infra/functions/create-payment-intent/src/main.js
+          node --check infra/functions/stripe-webhook/src/main.js
+
+      # The QR encoder prints the code a customer scans off the wall. It has no
+      # dependencies and no reference image to compare against, so the suite
+      # checks the Reed-Solomon and BCH algebra directly.
+      - name: Test the sales-kit tools
+        working-directory: infra/tools
+        run: node --test 'test/*.test.js'
+
+  app:
+    name: Flutter app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+
+  shell:
+    name: Infra scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: for f in infra/*.sh; do bash -n "$f"; done
+      - name: Guard against a re-opened appointments table
+        # The whole security model rests on this table not being public. A
+        # permission line that says otherwise should fail the build, not be
+        # discovered by a customer.
+        run: |
+          if grep -nE '^\s*create_table "\$TBL_APPOINTMENTS".*"any"' infra/setup_barber_db.sh; then
+            echo "::error::appointments table grants a public permission"
+            exit 1
+          fi
+          if grep -nE '^\s*set_table_perms "\$TBL_APPOINTMENTS".*"any"' infra/setup_barber_db.sh; then
+            echo "::error::appointments table grants a public permission"
+            exit 1
+          fi

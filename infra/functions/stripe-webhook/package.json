@@ -1,0 +1,17 @@
+{
+  "name": "stripe-webhook",
+  "version": "1.0.0",
+  "description": "Verifies Stripe events and is the only writer of an appointment's paid state.",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "echo 'Run via Appwrite Function execution'"
+  },
+  "dependencies": {
+    "stripe": "^16.0.0",
+    "undici": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
