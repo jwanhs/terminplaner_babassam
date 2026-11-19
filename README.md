@@ -1,6 +1,6 @@
 ## Walkthrough
 
-https://github.com/user-attachments/assets/8d040239-55b4-430a-905d-76dd17ff6a4d
+https://github.com/user-attachments/assets/ee23c35d-2aee-489d-8a54-9f32a24feb1d
 
 Pick kind of service, choose who serves you, tap a day and grab a free slot.
 When you leave just a name and number, done, no account, no WhatsApp back-and-forth,
